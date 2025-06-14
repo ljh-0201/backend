@@ -1,16 +1,36 @@
-# This is a sample Python script.
+import uvicorn
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from api.routers import iam, infra, devsecops
+from core.config import server_config
 
+def create_app() -> FastAPI:
+    app = FastAPI()
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+    # CORS 설정
+    origins = [
+        "http://localhost:3000",
+        f"http://{server_config['frontend']['host']}:{server_config['frontend']['port']}"
+    ]
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
+    # 로깅 미들웨어
+    #app.add_middleware(LoggingMiddleware)
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+    # 라우터 등록
+    #app.include_router(iam.router)
+    #app.include_router(infra.router)
+    app.include_router(devsecops.router)
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    return app
+
+app = create_app()
+
+uvicorn.run(app, host=server_config["backend"]["host"], port=server_config["backend"]["port"], access_log=False)
