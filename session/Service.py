@@ -17,9 +17,9 @@ class Service:
         )
         manager = BaseAWSManager(config)
         self._user_sessions[access_key] = manager
-        logger.info(f"[{access_key}] 사용자 등록 및 세션 초기화 완료")
+        logger.info(f"[{access_key}] user registration and session initialization complete")
 
     def get_user_manager(self, access_key: str) -> BaseAWSManager:
         if access_key not in self._user_sessions:
-            raise ValueError(f"등록되지 않은 사용자 access_key: {access_key}")
+            raise ValueError(f"unregistered user access_key: {access_key}")
         return self._user_sessions[access_key]

@@ -12,7 +12,7 @@ class IAMManager(BaseAWSManager):
         super().__init__(config)
         self.iam_client = self.session.client('iam')
         self.cloudtrail_client = self.session.client('cloudtrail')
-        logger.info("[IAM] IAMManager 초기화 완료")
+        logger.info("[IAM] IAMManager initialization complete")
 
     @staticmethod
     def _extract_allowed_actions(policies: List[Dict]) -> Dict[str, Any]:
@@ -35,29 +35,29 @@ class IAMManager(BaseAWSManager):
                         allowed_actions.update(actions)
 
             result = {"allowed_actions": sorted(list(allowed_actions))} if allowed_actions else {}
-            logger.info(f"[IAM] 정책에서 허용된 액션 추출 완료. 총 {len(result.get('allowed_actions', []))}개")
+            logger.info(f"[IAM] completed extracting allowed actions from policy. total {len(result.get('allowed_actions', []))}")
             return result
 
         except Exception as e:
-            logger.error(f"[IAM] 정책 파싱 실패: {e}")
+            logger.error(f"[IAM] policy parsing failed: {e}")
             raise
 
     def get_iam_users(self) -> Dict[str, Any]:
         try:
-            logger.info("[IAM] IAM 사용자 목록 조회 시작")
+            logger.info("[IAM] start querying the list of IAM users")
             user_names = []
             paginator = self.iam_client.get_paginator('list_users')
             for page in paginator.paginate():
                 user_names.extend([user['UserName'] for user in page['Users']])
-            logger.info(f"[IAM] 총 {len(user_names)}명의 IAM 사용자 조회 완료")
+            logger.info(f"[IAM] completed query of {len(user_names)} IAM users")
             return {"data": user_names}
         except ClientError as e:
-            logger.error(f"[IAM] 사용자 목록 조회 실패: {e}")
+            logger.error(f"[IAM] failed to retrieve user list: {e}")
             raise
 
     def get_managed_policies(self, user_name: str) -> Dict[str, Any]:
         try:
-            logger.info(f"[IAM] 사용자 '{user_name}'에 연결된 관리형 정책 조회 시작")
+            logger.info(f"[IAM] start managed policy lookup for user '{user_name}'")
             managed_policies = []
             attached_policies = self.iam_client.list_attached_user_policies(UserName=user_name)
 
@@ -75,16 +75,16 @@ class IAMManager(BaseAWSManager):
                     "Statement": policy_version['PolicyVersion']['Document']['Statement']
                 })
 
-            logger.info(f"[IAM] 총 {len(managed_policies)}개의 관리형 정책 조회 완료")
+            logger.info(f"[IAM] total {len(managed_policies)} managed policies search completed")
             return self._extract_allowed_actions(managed_policies)
 
         except ClientError as e:
-            logger.error(f"[IAM] 관리형 정책 조회 실패: {e}")
+            logger.error(f"[IAM] managed policy lookup failed: {e}")
             raise
 
     def get_inline_policies(self, user_name: str) -> Dict[str, Any]:
         try:
-            logger.info(f"[IAM] 사용자 '{user_name}'의 인라인 정책 조회 시작")
+            logger.info(f"[IAM] start inline policy lookup for user '{user_name}'")
             inline_policies = []
             policy_names = self.iam_client.list_user_policies(UserName=user_name)['PolicyNames']
 
@@ -99,16 +99,16 @@ class IAMManager(BaseAWSManager):
                     "Statement": policy_doc['PolicyDocument']['Statement']
                 })
 
-            logger.info(f"[IAM] 총 {len(inline_policies)}개의 인라인 정책 조회 완료")
+            logger.info(f"[IAM] total {len(inline_policies)} inline policies search completed")
             return self._extract_allowed_actions(inline_policies)
 
         except ClientError as e:
-            logger.error(f"[IAM] 인라인 정책 조회 실패: {e}")
+            logger.error(f"[IAM] inline policy lookup failed: {e}")
             raise
 
     def get_cloudtrail_events(self, user_name: str, analysis_days: int) -> Dict[str, Any]:
         try:
-            logger.info(f"[CloudTrail] 사용자 '{user_name}'의 최근 {analysis_days}일간 이벤트 조회 시작")
+            logger.info(f"[CloudTrail] start viewing events for the last {analysis_days} days for user '{user_name}'")
             events = []
             next_token = None
 
@@ -148,9 +148,9 @@ class IAMManager(BaseAWSManager):
                 events
             ) or []
 
-            logger.info(f"[CloudTrail] 총 {len(result)}건의 이벤트 수집 완료")
+            logger.info(f"[CloudTrail] total {len(result)} events search completed")
             return result
 
         except ClientError as e:
-            logger.error(f"[CloudTrail] 이벤트 수집 실패: {e}")
+            logger.error(f"[CloudTrail] event collection failed: {e}")
             raise

@@ -5,14 +5,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.routers import iam, infra, devsecops
 from core.config import server_config
 
+
 def create_app() -> FastAPI:
     app = FastAPI()
 
-    # CORS 설정
     origins = [
         "http://localhost:3000",
         f"http://{server_config['frontend']['host']}:{server_config['frontend']['port']}"
     ]
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
@@ -21,16 +22,19 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # 로깅 미들웨어
-    #app.add_middleware(LoggingMiddleware)
-
-    # 라우터 등록
     app.include_router(iam.router)
-    #app.include_router(infra.router)
+    app.include_router(infra.router)
     app.include_router(devsecops.router)
 
     return app
 
-app = create_app()
 
-uvicorn.run(app, host=server_config["backend"]["host"], port=server_config["backend"]["port"], access_log=False)
+server = create_app()
+
+if __name__ == "__main__":
+    uvicorn.run(
+        server,
+        host=server_config["backend"]["host"],
+        port=server_config["backend"]["port"],
+        access_log=False
+    )

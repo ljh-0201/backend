@@ -1,6 +1,6 @@
 server_config = {
     "frontend": {
-        "host": "frontend.default.svc.cluster.local",
+        "host": "localhost",
         "port": 3000
     },
     "backend": {

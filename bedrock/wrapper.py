@@ -1,4 +1,4 @@
-from .client import get_bedrock_client
+from bedrock.client import get_bedrock_client
 
 def call_bedrock_model(prompt: str) -> str:
     client = get_bedrock_client()

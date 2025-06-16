@@ -1,6 +1,6 @@
 from core.logger import logger
 import boto3
-from .AWSConfig import AWSConfig
+from session.AWSConfig import AWSConfig
 
 
 class BaseAWSManager:
@@ -15,8 +15,8 @@ class BaseAWSManager:
                 aws_secret_access_key=self.config.secret_key,
                 region_name=self.config.region
             )
-            logger.info("공통 AWS 세션 초기화 완료")
+            logger.info("commonness AWS session initialization complete")
             return session
         except Exception as e:
-            logger.error(f"AWS 세션 초기화 실패: {e}")
-            raise RuntimeError(f"AWS 세션 초기화 실패: {e}")
+            logger.error(f"AWS session initialization failure: {e}")
+            raise RuntimeError(f"AWS session initialization failure: {e}")
