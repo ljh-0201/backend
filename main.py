@@ -25,7 +25,7 @@ def create_app() -> FastAPI:
     #app.add_middleware(LoggingMiddleware)
 
     # 라우터 등록
-    #app.include_router(iam.router)
+    app.include_router(iam.router)
     #app.include_router(infra.router)
     app.include_router(devsecops.router)
 
