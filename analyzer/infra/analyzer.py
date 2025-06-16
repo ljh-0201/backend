@@ -1,7 +1,7 @@
 import json
 
 from analyzer.infra.prompts import prompt_infra_analysis
-from bedrock import llm
+from bedrock.llm import llm
 
 def analyze_infra() -> str:
     chain = prompt_infra_analysis | llm

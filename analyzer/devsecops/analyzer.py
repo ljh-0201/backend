@@ -1,7 +1,7 @@
 import json
 
 from analyzer.devsecops.prompts import prompt_devsecops_analysis
-from bedrock import llm
+from bedrock.llm import llm
 
 def analyze_devsecops(gitlab_ci: dict) -> str:
     chain = prompt_devsecops_analysis | llm
