@@ -48,7 +48,7 @@ def scan_gitlab_ci(data: Analyzer):
     try:
         manager = DevSecOpsManager(service.get_user_manager(data.access_key).config)
         gitlab_ci_file = manager.get_gitlab_ci_file(data.project_id)
-        result = analyzer.analyze_devsecops_pipeline(gitlab_ci_file)
+        result = analyzer.analyze_devsecops(gitlab_ci_file)
         return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

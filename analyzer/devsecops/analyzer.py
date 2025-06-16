@@ -1,6 +1,18 @@
-from analyzer.devsecops.prompts import build_prompt
-from analyzer.devsecops.model import analyze_with_bedrock
+import json
 
-def analyze_devsecops_pipeline(gitlab_ci_file: dict) -> str:
-    prompt = build_prompt(gitlab_ci_file)
-    return analyze_with_bedrock(prompt)
+from analyzer.devsecops.prompts import prompt_devsecops_analysis
+from bedrock import llm
+
+def analyze_devsecops(gitlab_ci: dict) -> str:
+    chain = prompt_devsecops_analysis | llm
+
+    response = chain.invoke({
+        "data": gitlab_ci
+    })
+
+    parsed_json = json.loads(response.content)
+    result = json.dumps(parsed_json, indent=4, ensure_ascii=False)
+
+    print(result)
+
+    return result

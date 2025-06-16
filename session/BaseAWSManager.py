@@ -15,7 +15,6 @@ class BaseAWSManager:
                 aws_secret_access_key=self.config.secret_key,
                 region_name=self.config.region
             )
-            logger.info("commonness AWS session initialization complete")
             return session
         except Exception as e:
             logger.error(f"AWS session initialization failure: {e}")

@@ -47,7 +47,7 @@ def scan_gitlab_ci(data: Analyzer):
         managed_policy = manager.get_managed_policies(data.user_name)
         inline_policy = manager.get_inline_policies(data.user_name)
         event = manager.get_cloudtrail_events(data.user_name, data.days)
-        result = analyzer.analyze_iam_policy(managed_policy, inline_policy, event, data.days)
+        result = analyzer.analyze_iam(managed_policy, inline_policy, event, data.days)
         return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
