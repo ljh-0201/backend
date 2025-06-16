@@ -1,18 +1,24 @@
 import json
-
 from analyzer.devsecops.prompts import prompt_devsecops_analysis
 from bedrock.llm import llm
+from core.logger import logger
+
 
 def analyze_devsecops(gitlab_ci: dict) -> str:
-    chain = prompt_devsecops_analysis | llm
+    try:
+        logger.info("[DevSecOps] Starting GitLab‑CI analysis")
 
-    response = chain.invoke({
-        "data": gitlab_ci
-    })
+        chain = prompt_devsecops_analysis | llm
+        response = chain.invoke({"data": gitlab_ci})
 
-    parsed_json = json.loads(response.content)
-    result = json.dumps(parsed_json, indent=4, ensure_ascii=False)
+        logger.info("[DevSecOps] LLM response received")
 
-    print(result)
+        parsed = json.loads(response.content)
+        result = json.dumps(parsed, indent=4, ensure_ascii=False)
 
-    return result
+        logger.info("[DevSecOps] LLM response parsed successfully")
+        return result
+
+    except Exception as e:
+        logger.error(f"[DevSecOps] GitLab‑CI analysis failed: {e}")
+        raise

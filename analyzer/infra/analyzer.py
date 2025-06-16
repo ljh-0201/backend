@@ -2,15 +2,23 @@ import json
 
 from analyzer.infra.prompts import prompt_infra_analysis
 from bedrock.llm import llm
+from core.logger import logger
 
 def analyze_infra() -> str:
-    chain = prompt_infra_analysis | llm
+    try:
+        logger.info("[Infra] Starting analysis")
 
-    response = chain.invoke()
+        chain = prompt_infra_analysis | llm
+        response = chain.invoke()
 
-    parsed_json = json.loads(response.content)
-    result = json.dumps(parsed_json, indent=4, ensure_ascii=False)
+        logger.info("[Infra] LLM response received")
 
-    print(result)
+        parsed = json.loads(response.content)
+        result = json.dumps(parsed, indent=4, ensure_ascii=False)
 
-    return result
+        logger.info("[Infra] LLM response parsed successfully")
+        return result
+
+    except Exception as e:
+        logger.error(f"[Infra] analysis failed: {e}")
+        raise
