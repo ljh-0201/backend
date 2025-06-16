@@ -18,7 +18,7 @@ class Users(BaseModel):
 class Analyzer(BaseModel):
     access_key: str
     user_name: str
-    days: int
+    days: int = 45
 
 @router.post("/session")
 def create_session(data: Session):

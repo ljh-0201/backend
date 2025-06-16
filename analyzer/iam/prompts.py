@@ -64,7 +64,7 @@ prompt_least_privilege_review = PromptTemplate(
     - or `last_usage` 값이 최근 7일 이내인 권한
 
     판단 시 반드시 위 기준을 우선적으로 따르세요. `frequency = 0`인 권한은 무조건 삭제 대상입니다.
-    또한, 판단 시 역할로 전환할 권한과 유지할 권한이 만약 와일드카드 권한(예: "s3:*")을 사용한다면, 반드시 전달 받은 'actual_use_policy' 값을 언급해야 합니다.
+    또한, 판단 시 역할로 전환할 권한과 유지할 권한이 만약 와일드카드 권한(예: "s3:*")을 사용한다면, 반드시 전달 받은 'actual_use_policy' 값을 참고해야 합니다.
 
     당신이 전달 받은 정보는 다음 JSON 형식입니다:  
     {data}
@@ -78,6 +78,8 @@ prompt_least_privilege_review = PromptTemplate(
     - `conversion_decision`: 전환 권장 사유(판단 기준 중 만족한 항목)
     - `retention_recommend`: 유지 권장 권한
     - `retention_decision`: 유지 권장 사유(판단 기준 중 만족한 항목)
+    
+    추가적으로, 각 항목의 권한에 와일드카드 권한(`*`)이 포함된 경우 `actual_use_policy`에 명시된 실제 권한을 함께 언급하며, 사유를 작성하세요.
 
     JSON 출력 형식:
     {{

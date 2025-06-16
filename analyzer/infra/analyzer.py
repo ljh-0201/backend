@@ -14,7 +14,7 @@ def analyze_infra() -> str:
         logger.info("[Infra] LLM response received")
 
         parsed = json.loads(response.content)
-        result = json.dumps(parsed, indent=4, ensure_ascii=False)
+        result = json.dumps(parsed)
 
         logger.info("[Infra] LLM response parsed successfully")
         return result

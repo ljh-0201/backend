@@ -3,23 +3,23 @@ from botocore.config import Config
 import boto3
 
 timeout_config = Config(
-    connect_timeout=10,   # 연결 시도 제한 시간
-    read_timeout=300,     # 응답 대기 시간 (5분)
+    connect_timeout=10,
+    read_timeout=600,
     retries={
-        'max_attempts': 3,    # 재시도 횟수
-        'mode': 'standard'    # 기본 재시도 모드
+        'max_attempts': 3,
+        'mode': 'standard'
     }
 )
 
 bedrock_runtime_client = boto3.client(
     "bedrock-runtime",
-    region_name="us-east-1",  # 사용 중인 리전 명시
+    region_name="us-east-1",
     config=timeout_config
 )
 
 llm = ChatBedrock(
     model_id="anthropic.claude-3-sonnet-20240229-v1:0",
-    client=bedrock_runtime_client,  # 커스텀 클라이언트 주입
+    client=bedrock_runtime_client,
     model_kwargs={
         "temperature": 0.1,
         "max_tokens": 4096

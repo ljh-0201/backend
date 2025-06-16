@@ -17,7 +17,7 @@ def analyze_iam(managed_policy: dict, inline_policy: dict, event: dict, days: in
 
         logger.info("[IAM] LLM first response received")
         parsed_json = json.loads(response.content)
-        result = json.dumps(parsed_json, indent=4, ensure_ascii=False)
+        result = json.dumps(parsed_json)
 
         logger.info("[IAM] starting second analysis")
         chain = prompt_least_privilege_review | llm
@@ -27,7 +27,7 @@ def analyze_iam(managed_policy: dict, inline_policy: dict, event: dict, days: in
 
         logger.info("[IAM] LLM second response received")
         parsed_json = json.loads(response.content)
-        result = json.dumps(parsed_json, indent=4, ensure_ascii=False)
+        result = json.dumps(parsed_json)
 
         logger.info("[IAM] LLM response parsed successfully")
         return result

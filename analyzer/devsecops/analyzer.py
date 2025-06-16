@@ -14,7 +14,7 @@ def analyze_devsecops(gitlab_ci: dict) -> str:
         logger.info("[DevSecOps] LLM response received")
 
         parsed = json.loads(response.content)
-        result = json.dumps(parsed, indent=4, ensure_ascii=False)
+        result = json.dumps(parsed)
 
         logger.info("[DevSecOps] LLM response parsed successfully")
         return result
