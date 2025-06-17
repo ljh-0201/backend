@@ -22,7 +22,8 @@ def analyze_iam(managed_policy: dict, inline_policy: dict, event: dict, days: in
         logger.info("[IAM] starting second analysis")
         chain = prompt_least_privilege_review | llm
         response = chain.invoke({
-            "data": result
+            "data": result,
+            "days": days
         })
 
         logger.info("[IAM] LLM second response received")
@@ -33,5 +34,5 @@ def analyze_iam(managed_policy: dict, inline_policy: dict, event: dict, days: in
         return result
 
     except Exception as e:
-        logger.error(f"[Infra] analysis failed: {e}")
+        logger.error(f"[IAM] analysis failed: {e}")
         raise
