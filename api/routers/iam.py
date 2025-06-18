@@ -47,7 +47,23 @@ def scan_gitlab_ci(data: Analyzer):
         managed_policy = manager.get_managed_policies(data.user_name)
         inline_policy = manager.get_inline_policies(data.user_name)
         event = manager.get_cloudtrail_events(data.user_name, data.days)
-        result = analyzer.analyze_iam(managed_policy, inline_policy, event, data.days)
+        usage = analyzer.analyze_iam_usage(managed_policy, inline_policy, event, data.days)
+        result = analyzer.analyze_iam(usage, data.days)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/users/analyzer/2")
+def scan_gitlab_ci(data: Analyzer):
+    try:
+        result = []
+        manager = IAMManager(service.get_user_manager(data.access_key).config)
+        managed_policy = manager.get_managed_policies(data.user_name)
+        inline_policy = manager.get_inline_policies(data.user_name)
+        event = manager.get_cloudtrail_events(data.user_name, data.days)
+        usage = analyzer.analyze_iam_usage(managed_policy, inline_policy, event, data.days)
+        result.append(usage)
+        result.append(analyzer.analyze_iam(usage, data.days))
         return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
