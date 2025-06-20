@@ -9,14 +9,9 @@ from core.config import server_config
 def create_app() -> FastAPI:
     app = FastAPI()
 
-    origins = [
-        "http://localhost:3000",
-        f"http://{server_config['frontend']['host']}:{server_config['frontend']['port']}"
-    ]
-
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=origins,
+        allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

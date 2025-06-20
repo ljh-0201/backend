@@ -1,10 +1,6 @@
 server_config = {
-    "frontend": {
-        "host": "localhost",
-        "port": 3000
-    },
     "backend": {
-        "host": "localhost",
+        "host": "0.0.0.0",
         "port": 5001
     }
 }
