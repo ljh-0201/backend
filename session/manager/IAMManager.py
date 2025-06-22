@@ -65,7 +65,7 @@ class IAMManager(BaseAWSManager):
                                 logger.warning(
                                     f"[IAM] AccessKeyLastUsed not available for key {key['AccessKeyId']} (user: {user_name})")
                     except ClientError as e:
-                        logger.warning(f"[IAM] Failed to list access keys for user {user_name}: {e}")
+                        logger.warning(f"[IAM] failed to list access keys for user {user_name}: {e}")
 
                     result.append({
                         "UserName": user_name,
@@ -74,7 +74,7 @@ class IAMManager(BaseAWSManager):
                     })
             logger.info(f"[IAM] completed retrieving activity summary for {len(result)} users")
         except ClientError as e:
-            logger.error(f"[IAM] Failed to paginate users: {e}")
+            logger.error(f"[IAM] failed to paginate users: {e}")
             raise
 
         return {"data": result}
