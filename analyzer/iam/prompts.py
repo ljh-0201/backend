@@ -8,8 +8,9 @@ prompt_policy_log_analysis = PromptTemplate(
 
     1. 정책 문서에서 각 **권한 문자열**(예: `"s3:GetObject"`, `"ec2:*"`)을 추출한다.  
     2. CloudTrail 이벤트 로그에서 각 권한이 **호출된 횟수**(`frequency`)와 **가장 최근 호출 시각**(`last_usage`, ISO‑8601)을 계산한다.  
-    3. 권한 문자열에 와일드카드(`*`)가 포함된 경우, 이벤트 로그를 이용해 **실제로 호출된 세부 작업 목록**을 `actual_use_policy`(배열) 필드에 추가한다.  
-    4. 정책에 정의돼 있지만 로그에 **전혀 등장하지 않은** 권한은 `frequency` `0`, `last_usage` `null` 로 기록한다.
+    3. 권한 문자열에 와일드카드(`*`)가 포함된 경우, 이벤트 로그를 이용해 **실제로 호출된 세부 작업 목록**을 `actual_use_policy`(배열) 필드에 추가한다.
+    4. 권한 문자열에 와일드카드(`*`)가 포함된 경우, **호출된 횟수**(`frequency`)는 `actual_use_policy`(배열)의 `frequency`의 총 합과 같아야 한다.
+    5. 정책에 정의돼 있지만 로그에 **전혀 등장하지 않은** 권한은 `frequency` `0`, `last_usage` `null` 로 기록한다.
 
     ---
     ### 입력(모두 JSON 문서)
@@ -25,7 +26,13 @@ prompt_policy_log_analysis = PromptTemplate(
             "permission": "string",
             "frequency": integer,
             "last_usage": "YYYY-MM-DDTHH:MM:SSZ or null",
-            "actual_use_policy": ["string", ...]   // 와일드카드일 때만 포함
+            "actual_use_policy": [
+                {{
+                    "permission": "string",
+                    "frequency": integer,
+                    "last_usage": "YYYY-MM-DDTHH:MM:SSZ or null",
+                }}, ...
+            ]   // 와일드카드일 때만 포함
         }},
         ...
         ]
@@ -37,7 +44,7 @@ prompt_policy_log_analysis = PromptTemplate(
     - 문자열은 모두 큰따옴표로 감싼다.
     - JSON 이외의 텍스트(설명, 주석, 추가 구문)를 절대 포함하지 않는다.
     - 날짜·시간은 항상 UTC ISO‑8601 형식 사용.
-    
+
     단계별로 사고하되, 최종 응답에는 오직 JSON만 남겨라.
     """
 )
@@ -89,7 +96,7 @@ prompt_least_privilege_review = PromptTemplate(
             "retention_decision": "string"
         }}
     }}
-    
+
     출력 규칙
     - 출력은 반드시 유효한 JSON만 포함해야 합니다 (절대 주석, 설명 추가 금지)
     - 문자열은 모두 **큰따옴표(")**로 감쌀 것

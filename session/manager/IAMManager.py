@@ -45,15 +45,39 @@ class IAMManager(BaseAWSManager):
     def get_iam_users(self) -> Dict[str, Any]:
         try:
             logger.info("[IAM] start querying the list of IAM users")
-            user_names = []
+            result = []
             paginator = self.iam_client.get_paginator('list_users')
             for page in paginator.paginate():
-                user_names.extend([user['UserName'] for user in page['Users']])
-            logger.info(f"[IAM] completed query of {len(user_names)} IAM users")
-            return {"data": user_names}
+                for user in page["Users"]:
+                    user_name = user["UserName"]
+                    pwd_last_used = user.get("PasswordLastUsed")
+
+                    latest_key_used = None
+                    try:
+                        keys = self.iam_client.list_access_keys(UserName=user_name)["AccessKeyMetadata"]
+                        for key in keys:
+                            try:
+                                resp = self.iam_client.get_access_key_last_used(AccessKeyId=key["AccessKeyId"])
+                                key_used = resp.get("AccessKeyLastUsed", {}).get("LastUsedDate")
+                                if key_used and (latest_key_used is None or key_used > latest_key_used):
+                                    latest_key_used = key_used
+                            except ClientError:
+                                logger.warning(
+                                    f"[IAM] AccessKeyLastUsed not available for key {key['AccessKeyId']} (user: {user_name})")
+                    except ClientError as e:
+                        logger.warning(f"[IAM] Failed to list access keys for user {user_name}: {e}")
+
+                    result.append({
+                        "UserName": user_name,
+                        "PasswordLastUsed": pwd_last_used,
+                        "LastAccessKeyUsed": latest_key_used,
+                    })
+            logger.info(f"[IAM] completed retrieving activity summary for {len(result)} users")
         except ClientError as e:
-            logger.error(f"[IAM] failed to retrieve user list: {e}")
+            logger.error(f"[IAM] Failed to paginate users: {e}")
             raise
+
+        return {"data": result}
 
     def get_managed_policies(self, user_name: str) -> Dict[str, Any]:
         try:
